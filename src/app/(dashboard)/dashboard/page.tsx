@@ -1,33 +1,57 @@
-// app/dashboard/page.tsx
-import { redirect } from 'next/navigation';
-import { getCurrentUser } from '../../actions/user';
+import {
+  Container,
+  Paper,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardActionArea,
+  Box,
+} from '@mui/material';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 import Link from 'next/link';
+import { getCurrentUser } from '@/app/actions/user';
 
 export default async function DashboardPage() {
-  const { user, error } = await getCurrentUser();
-
-  if (error) {
-    return redirect('/login');
-  }
+  const { user } = await getCurrentUser();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="bg-white rounded-2xl shadow-xl p-8 transition-all hover:shadow-2xl">
-          <h1 className="text-3xl font-bold mb-6 text-indigo-800 border-b pb-4">ダッシュボード</h1>
+    <Container maxWidth="xl">
+      <Typography variant="h3" component="h1" gutterBottom fontWeight="bold" color="primary">
+        ダッシュボード
+      </Typography>
 
-          <div className="mb-8">
-            <p className="mb-2 text-lg">ようこそ、<span className="font-semibold text-indigo-700">{user.name}</span> さん！</p>
-            <p className="text-gray-600">{user.email}</p>
-          </div>
+      <Box sx={{ my: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          ようこそ、<Box component="span" fontWeight="bold">{user?.name}</Box> さん！
+        </Typography>
+      </Box>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link href="/todo" className="block p-6 bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md text-white text-center transition-all hover:shadow-lg transform hover:-translate-y-1">
-              <span className="text-xl font-semibold">ToDo一覧を表示</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+      <Container maxWidth="xl" disableGutters>
+        <Paper elevation={2} sx={{ p: 4, borderRadius: 2 }}>
+          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold" color="primary">
+            メニュー
+          </Typography>
+
+          <Grid container spacing={3} sx={{ mt: 2 }}>
+            <Grid item xs={12} sm={6} md={4}>
+              <Card elevation={3} sx={{ height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)' } }}>
+                <CardActionArea component={Link} href="/todo" sx={{ height: '100%', p: 2 }}>
+                  <CardContent sx={{ textAlign: 'center' }}>
+                    <ChecklistIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+                    <Typography variant="h6" component="div" fontWeight="bold">
+                      ToDoリスト
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      タスクの管理と確認
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Container>
+    </Container>
   );
 }
