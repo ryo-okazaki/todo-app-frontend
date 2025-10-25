@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { fetchTodo, updateTodo, Todo } from '../../actions/todo';
+import { fetchTodo, updateTodo, Todo } from '../../../actions/todo';
 
 interface PageProps {
   params: {

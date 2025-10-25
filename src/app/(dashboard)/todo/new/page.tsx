@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createTodo } from '../../actions/todo';
+import { createTodo } from '../../../actions/todo';
 
 export default function NewTodoPage() {
   const [title, setTitle] = useState('');

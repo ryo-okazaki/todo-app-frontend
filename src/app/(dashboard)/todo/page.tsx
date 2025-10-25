@@ -1,6 +1,6 @@
 // app/todos/page.tsx
 import Link from 'next/link';
-import { fetchTodosServer, Todo } from '../actions/todo';
+import { fetchTodosServer, Todo } from '../../actions/todo';
 
 export const dynamic = 'force-dynamic'; // 常に最新データを取得
 
@@ -36,7 +36,7 @@ export default async function TodosPage() {
                 ダッシュボード
               </Link>
               <Link
-                href="/todo/new"
+                href="/src/app/(dashboard)/todo/new"
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white transition-colors tracking-wide"
               >
                 新規作成
@@ -59,7 +59,7 @@ export default async function TodosPage() {
                   <div className="p-3 rounded-lg">
                     <div className="flex justify-between items-center">
                       <Link
-                        href={`/todo/${todo.id}`}
+                        href={`/src/app/(dashboard)/todo/${todo.id}`}
                         className="text-lg font-medium text-gray-900 hover:text-indigo-600 transition-colors"
                       >
                         {todo.title}

@@ -1,6 +1,6 @@
 // app/dashboard/page.tsx
 import { redirect } from 'next/navigation';
-import { getCurrentUser } from '../actions/user';
+import { getCurrentUser } from '../../actions/user';
 import Link from 'next/link';
 
 export default async function DashboardPage() {
