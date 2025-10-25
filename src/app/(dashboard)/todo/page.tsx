@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Card,
+  CardActionArea,
   CardContent,
   CardMedia,
   Grid,
@@ -95,94 +96,90 @@ export default async function TodosPage() {
                     },
                   }}
                 >
-                  <CardContent>
-                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
-                      {/* 画像エリア */}
-                      {todo.images && Array.isArray(todo.images) && todo.images.length > 0 && (
-                        <Box sx={{ flexShrink: 0 }}>
-                          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                            {todo.images.slice(0, 3).map((image: any, idx: number) => (
-                              <CardMedia
-                                key={idx}
-                                component="img"
-                                image={image.url}
-                                alt={`イメージ ${idx + 1}`}
-                                sx={{
-                                  width: 150,
-                                  height: 150,
-                                  objectFit: 'cover',
-                                  borderRadius: 1,
-                                }}
-                              />
-                            ))}
-                            {todo.images.length > 3 && (
-                              <Box
-                                sx={{
-                                  width: 150,
-                                  height: 150,
-                                  bgcolor: 'grey.200',
-                                  borderRadius: 1,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexDirection: 'column',
-                                }}
-                              >
-                                <ImageIcon sx={{ fontSize: 40, color: 'grey.500' }} />
-                                <Typography variant="body2" color="text.secondary">
-                                  +{todo.images.length - 3} 枚
-                                </Typography>
-                              </Box>
-                            )}
+                  <CardActionArea component={Link} href={`/todo/${todo.id}`}>
+                    <CardContent>
+                      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
+                        {/* 画像エリア */}
+                        {todo.images && Array.isArray(todo.images) && todo.images.length > 0 && (
+                          <Box sx={{ flexShrink: 0 }}>
+                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                              {todo.images.slice(0, 3).map((image: any, idx: number) => (
+                                <CardMedia
+                                  key={idx}
+                                  component="img"
+                                  image={image.url}
+                                  alt={`イメージ ${idx + 1}`}
+                                  sx={{
+                                    width: 150,
+                                    height: 150,
+                                    objectFit: 'cover',
+                                    borderRadius: 1,
+                                  }}
+                                />
+                              ))}
+                              {todo.images.length > 3 && (
+                                <Box
+                                  sx={{
+                                    width: 150,
+                                    height: 150,
+                                    bgcolor: 'grey.200',
+                                    borderRadius: 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexDirection: 'column',
+                                  }}
+                                >
+                                  <ImageIcon sx={{ fontSize: 40, color: 'grey.500' }} />
+                                  <Typography variant="body2" color="text.secondary">
+                                    +{todo.images.length - 3} 枚
+                                  </Typography>
+                                </Box>
+                              )}
+                            </Box>
                           </Box>
-                        </Box>
-                      )}
+                        )}
 
-                      {/* テキストエリア */}
-                      <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                        <Typography
-                          variant="h6"
-                          component={Link}
-                          href={`/todo/${todo.id}`}
-                          sx={{
-                            textDecoration: 'none',
-                            color: 'text.primary',
-                            fontWeight: 'bold',
-                            '&:hover': {
-                              color: 'primary.main',
-                            },
-                          }}
-                        >
-                          {todo.title}
-                        </Typography>
-
-                        {todo.description && (
+                        {/* テキストエリア */}
+                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                           <Typography
-                            variant="body2"
-                            color="text.secondary"
+                            variant="h6"
                             sx={{
-                              mt: 1,
-                              display: '-webkit-box',
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
+                              color: 'text.primary',
+                              fontWeight: 'bold',
                             }}
                           >
-                            {todo.description}
+                            {todo.title}
                           </Typography>
-                        )}
 
-                        {todo.images && todo.images.length > 0 && (
-                          <Chip
-                            icon={<ImageIcon />}
-                            label={`${todo.images.length} 枚の画像`}
-                            size="small"
-                            sx={{ mt: 2 }}
-                          />
-                        )}
+                          {todo.description && (
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{
+                                mt: 1,
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                              }}
+                            >
+                              {todo.description}
+                            </Typography>
+                          )}
+
+                          {todo.images && todo.images.length > 0 && (
+                            <Chip
+                              icon={<ImageIcon />}
+                              label={`${todo.images.length} 枚の画像`}
+                              size="small"
+                              sx={{ mt: 2 }}
+                            />
+                          )}
+                        </Box>
                       </Box>
-                    </Box>
-                  </CardContent>
+                    </CardContent>
+                  </CardActionArea>
                 </Card>
               </Grid>
             ))}
