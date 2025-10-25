@@ -1,6 +1,29 @@
 'use server';
 
 import { cookies } from "next/headers";
+import { z } from 'zod';
+
+// バリデーションスキーマ
+const registerSchema = z.object({
+  name: z.string().min(1, '名前を入力してください').max(50, '名前は50文字以内で入力してください'),
+  email: z.string().email('有効なメールアドレスを入力してください'),
+  password: z
+    .string()
+    .min(8, 'パスワードは8文字以上で入力してください')
+    .regex(/[A-Za-z]/, 'パスワードには英字を含めてください')
+    .regex(/[0-9]/, 'パスワードには数字を含めてください'),
+  passwordConfirmation: z.string(),
+}).refine((data) => data.password === data.passwordConfirmation, {
+  message: 'パスワードが一致しません',
+  path: ['passwordConfirmation'],
+});
+
+export type RegisterFieldErrors = {
+  name?: string[];
+  email?: string[];
+  password?: string[];
+  passwordConfirmation?: string[];
+};
 
 export async function loginAction(formData: FormData) {
   const email = formData.get('email') as string;
@@ -49,4 +72,96 @@ export async function logoutAction() {
   const cookieStore = await cookies();
   cookieStore.delete('authToken');
   return { success: true };
+}
+
+export async function registerAction(formData: FormData) {
+  const name = formData.get('name');
+  const email = formData.get('email');
+  const password = formData.get('password');
+  const passwordConfirmation = formData.get('passwordConfirmation');
+
+  // バリデーション
+  const validationResult = registerSchema.safeParse({
+    name,
+    email,
+    password,
+    passwordConfirmation,
+  });
+
+  if (!validationResult.success) {
+    const fieldErrors: RegisterFieldErrors = {};
+    validationResult.error.errors.forEach((error) => {
+      const field = error.path[0] as keyof RegisterFieldErrors;
+      if (!fieldErrors[field]) {
+        fieldErrors[field] = [];
+      }
+      fieldErrors[field]!.push(error.message);
+    });
+
+    return {
+      success: false,
+      error: 'バリデーションエラーがあります',
+      fieldErrors,
+    };
+  }
+
+  try {
+    const apiBaseUrl = process.env.API_BASE_URL || 'http://todo-express:3000';
+    // API呼び出し
+    const response = await fetch(`${apiBaseUrl}/api/user/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: validationResult.data.name,
+        email: validationResult.data.email,
+        password: validationResult.data.password,
+        password_confirmation: validationResult.data.passwordConfirmation,
+      }),
+    });
+
+    console.log(`register success:`, response);
+    const data = await response.json();
+
+    if (!response.ok) {
+      // サーバー側のバリデーションエラー
+      if (response.status === 422 && data.errors) {
+        const fieldErrors: RegisterFieldErrors = {};
+
+        // Laravel形式のエラーをマッピング
+        if (data.errors.email) {
+          fieldErrors.email = data.errors.email;
+        }
+        if (data.errors.password) {
+          fieldErrors.password = data.errors.password;
+        }
+        if (data.errors.name) {
+          fieldErrors.name = data.errors.name;
+        }
+
+        return {
+          success: false,
+          error: data.message || 'バリデーションエラーがあります',
+          fieldErrors,
+        };
+      }
+
+      return {
+        success: false,
+        error: data.message || '登録に失敗しました',
+      };
+    }
+
+    return {
+      success: true,
+      message: 'アカウントが作成されました。メールを確認してください。',
+    };
+  } catch (error) {
+    console.error('Register error:', error);
+    return {
+      success: false,
+      error: 'ネットワークエラーが発生しました',
+    };
+  }
 }
