@@ -1,8 +1,22 @@
-// app/todos/page.tsx
 import Link from 'next/link';
-import { fetchTodosServer, Todo } from '../../actions/todo';
+import {
+  Container,
+  Paper,
+  Typography,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Grid,
+  Alert,
+  Chip,
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import ImageIcon from '@mui/icons-material/Image';
+import { fetchTodosServer, Todo } from '@/app/actions/todo';
 
-export const dynamic = 'force-dynamic'; // 常に最新データを取得
+export const dynamic = 'force-dynamic';
 
 export default async function TodosPage() {
   let todos: Todo[] = [];
@@ -10,7 +24,6 @@ export default async function TodosPage() {
 
   try {
     const fetchedTodos = await fetchTodosServer();
-    // APIからの戻り値が配列であることを確認
     if (Array.isArray(fetchedTodos)) {
       todos = fetchedTodos;
     } else {
@@ -23,78 +36,159 @@ export default async function TodosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="flex justify-between items-center mb-6 border-b pb-4">
-            <h1 className="text-3xl font-bold text-gray-800">ToDo一覧</h1>
-            <div className="flex space-x-4">
-              <Link
-                href="/dashboard"
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 transition-colors tracking-wide"
-              >
-                ダッシュボード
-              </Link>
-              <Link
-                href="/src/app/(dashboard)/todo/new"
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white transition-colors tracking-wide"
-              >
-                新規作成
-              </Link>
-            </div>
-          </div>
+    <Container maxWidth="lg">
+      <Paper elevation={2} sx={{ p: 4, borderRadius: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h4" component="h1" fontWeight="bold" color="primary">
+            ToDo一覧
+          </Typography>
+          <Button
+            component={Link}
+            href="/todo/new"
+            variant="contained"
+            startIcon={<AddIcon />}
+            size="large"
+          >
+            新規作成
+          </Button>
+        </Box>
 
-          {error ? (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 my-4">
-              <p className="text-red-700">{error}</p>
-            </div>
-          ) : todos.length === 0 ? (
-            <div className="text-center p-6 bg-gray-50 rounded-lg">
-              <p className="text-gray-500">ToDoがありません。新しいToDoを追加してください。</p>
-            </div>
-          ) : (
-            <ul className="divide-y divide-gray-200">
-              {todos.map((todo: Todo) => (
-                <li key={todo.id} className="py-4">
-                  <div className="p-3 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <Link
-                        href={`/src/app/(dashboard)/todo/${todo.id}`}
-                        className="text-lg font-medium text-gray-900 hover:text-indigo-600 transition-colors"
-                      >
-                        {todo.title}
-                      </Link>
-                    </div>
-                    {todo.description && (
-                      <p className="mt-1 text-gray-600 line-clamp-2">{todo.description}</p>
-                    )}
-                    {todo.images && Array.isArray(todo.images) && todo.images.length > 0 && (
-                      <div className="mt-2 flex gap-2 overflow-x-auto pb-2">
-                        {todo.images.slice(0, 3).map((image, idx) => (
-                          <img
-                            key={idx}
-                            src={image.url}
-                            alt={`イメージ ${idx+1}`}
-                            width={150}
-                            height={150}
-                            className="object-cover rounded-md p-[5]"
-                          />
-                        ))}
-                        {todo.images.length > 3 && (
-                          <div className="h-10 w-10 bg-gray-100 rounded-md flex items-center justify-center text-gray-500 text-xs">
-                            +{todo.images.length - 3}
-                          </div>
+        {error ? (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        ) : todos.length === 0 ? (
+          <Box
+            sx={{
+              textAlign: 'center',
+              py: 8,
+              bgcolor: 'grey.50',
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              ToDoがありません
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              新しいToDoを追加してください
+            </Typography>
+            <Button
+              component={Link}
+              href="/todo/new"
+              variant="contained"
+              startIcon={<AddIcon />}
+            >
+              最初のToDoを作成
+            </Button>
+          </Box>
+        ) : (
+          <Grid container spacing={3}>
+            {todos.map((todo: Todo) => (
+              <Grid item xs={12} key={todo.id}>
+                <Card
+                  elevation={1}
+                  sx={{
+                    transition: 'all 0.3s',
+                    '&:hover': {
+                      elevation: 4,
+                      transform: 'translateY(-2px)',
+                    },
+                  }}
+                >
+                  <CardContent>
+                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
+                      {/* 画像エリア */}
+                      {todo.images && Array.isArray(todo.images) && todo.images.length > 0 && (
+                        <Box sx={{ flexShrink: 0 }}>
+                          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                            {todo.images.slice(0, 3).map((image: any, idx: number) => (
+                              <CardMedia
+                                key={idx}
+                                component="img"
+                                image={image.url}
+                                alt={`イメージ ${idx + 1}`}
+                                sx={{
+                                  width: 150,
+                                  height: 150,
+                                  objectFit: 'cover',
+                                  borderRadius: 1,
+                                }}
+                              />
+                            ))}
+                            {todo.images.length > 3 && (
+                              <Box
+                                sx={{
+                                  width: 150,
+                                  height: 150,
+                                  bgcolor: 'grey.200',
+                                  borderRadius: 1,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexDirection: 'column',
+                                }}
+                              >
+                                <ImageIcon sx={{ fontSize: 40, color: 'grey.500' }} />
+                                <Typography variant="body2" color="text.secondary">
+                                  +{todo.images.length - 3} 枚
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+                        </Box>
+                      )}
+
+                      {/* テキストエリア */}
+                      <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                        <Typography
+                          variant="h6"
+                          component={Link}
+                          href={`/todo/${todo.id}`}
+                          sx={{
+                            textDecoration: 'none',
+                            color: 'text.primary',
+                            fontWeight: 'bold',
+                            '&:hover': {
+                              color: 'primary.main',
+                            },
+                          }}
+                        >
+                          {todo.title}
+                        </Typography>
+
+                        {todo.description && (
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              mt: 1,
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                            }}
+                          >
+                            {todo.description}
+                          </Typography>
                         )}
-                      </div>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-    </div>
-  );
 
+                        {todo.images && todo.images.length > 0 && (
+                          <Chip
+                            icon={<ImageIcon />}
+                            label={`${todo.images.length} 枚の画像`}
+                            size="small"
+                            sx={{ mt: 2 }}
+                          />
+                        )}
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Paper>
+    </Container>
+  );
 }
