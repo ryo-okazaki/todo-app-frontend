@@ -25,7 +25,7 @@ export default function NewTodoPage() {
 
     try {
       await createTodo(title);
-      router.push('/todos');
+      router.push('/todo');
       router.refresh(); // 一覧を更新するため
     } catch (err) {
       setError('ToDoの作成に失敗しました。もう一度お試しください。');
