@@ -16,7 +16,7 @@ export async function getCurrentUser() {
       return { error: 'Not authenticated' };
     }
 
-    const apiBaseUrl = process.env.API_BASE_URL || 'http://express:3001';
+    const apiBaseUrl = process.env.API_BASE_URL || 'http://todo-express:3000';
     const response = await fetch(`${apiBaseUrl}/api/user`, {
       method: 'GET',
       headers: {

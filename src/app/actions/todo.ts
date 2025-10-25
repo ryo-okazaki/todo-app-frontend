@@ -14,7 +14,7 @@ export interface Todo {
 // サーバーコンポーネントからの呼び出し用
 export async function fetchTodosServer(): Promise<Todo[]> {
   try {
-    const response = await fetch('http://express:3000/api/todo', {
+    const response = await fetch('http://todo-express:3000/api/todo', {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${(await cookies()).get('authToken')?.value}`
@@ -36,7 +36,7 @@ export async function fetchTodosServer(): Promise<Todo[]> {
 // クライアントコンポーネントからの呼び出し用
 export async function fetchTodos(): Promise<Todo[]> {
   try {
-    const response = await fetch('http://express:3000/api/todo', {
+    const response = await fetch('http://todo-express:3000/api/todo', {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${(await cookies()).get('authToken')?.value}`
@@ -57,7 +57,7 @@ export async function fetchTodos(): Promise<Todo[]> {
 
 export async function fetchTodo(id: number): Promise<Todo> {
   try {
-    const response = await fetch(`http://express:3000/api/todo/${id}`, {
+    const response = await fetch(`http://todo-express:3000/api/todo/${id}`, {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${(await cookies()).get('authToken')?.value}`
@@ -77,7 +77,7 @@ export async function fetchTodo(id: number): Promise<Todo> {
 
 export async function createTodo(title: string): Promise<Todo> {
   try {
-    const response = await fetch('http://express:3000/api/todo', {
+    const response = await fetch('http://todo-express:3000/api/todo', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -103,7 +103,7 @@ export async function updateTodo(
   formData: FormData
 ): Promise<Todo> {
   try {
-    const response = await fetch(`http://express:3000/api/todo/${id}`, {
+    const response = await fetch(`http://todo-express:3000/api/todo/${id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${(await cookies()).get('authToken')?.value}`

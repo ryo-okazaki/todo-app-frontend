@@ -11,7 +11,7 @@ export async function loginAction(formData: FormData) {
   }
 
   try {
-    const apiBaseUrl = process.env.API_BASE_URL || 'http://express:3000';
+    const apiBaseUrl = process.env.API_BASE_URL || 'http://todo-express:3000';
     const response = await fetch(`${apiBaseUrl}/api/user/login`, {
       method: 'POST',
       headers: {
