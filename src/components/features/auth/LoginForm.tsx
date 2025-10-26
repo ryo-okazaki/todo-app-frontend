@@ -3,123 +3,142 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useFormStatus } from 'react-dom';
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Paper,
+  CircularProgress,
+  Divider,
+} from '@mui/material';
+import LoginIcon from '@mui/icons-material/Login';
 import { loginAction } from '@/app/actions/auth';
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="flex justify-center "
-    >
-      {pending ? 'ログイン中...' : 'ログイン'}
-    </button>
-  );
-}
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // クライアント側でのフォーム送信処理
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError(null);
+    setIsLoading(true);
 
     try {
-      // FormData オブジェクトを作成
       const formData = new FormData();
       formData.append('email', email);
       formData.append('password', password);
 
-      // Server Action を呼び出し
       const result = await loginAction(formData);
 
       if (result.error) {
         setFormError(result.error);
+        setIsLoading(false);
         return;
       }
 
       if (result.success) {
-        // ログイン成功後にダッシュボードにリダイレクト
         router.push('/dashboard');
-        router.refresh(); // ナビゲーションやユーザー情報を更新
+        router.refresh();
       }
     } catch (err) {
       setFormError('予期せぬエラーが発生しました');
       console.error('Form submission error:', err);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-1/4 space-y-8 p-10 bg-black rounded-xl shadow-md mx-auto">
-      <div>
-        <h1 className="text-center text-3xl font-extrabold text-gray-900">ログイン</h1>
-      </div>
+    <Paper
+      elevation={3}
+      sx={{
+        p: 4,
+        width: '100%',
+        borderRadius: 2,
+      }}
+    >
+      <Box sx={{ textAlign: 'center', mb: 3 }}>
+        <LoginIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+        <Typography variant="h4" component="h1" fontWeight="bold" color="primary">
+          ログイン
+        </Typography>
+      </Box>
 
       {formError && (
-        <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded" role="alert">
+        <Alert severity="error" sx={{ mb: 3 }}>
           {formError}
-        </div>
+        </Alert>
       )}
 
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-        <div>
-          <div className="pt-[10]">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              メールアドレス
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
+      <Box component="form" onSubmit={handleSubmit} noValidate>
+        <TextField
+          fullWidth
+          label="メールアドレス"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          margin="normal"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={isLoading}
+          placeholder="your-email@example.com"
+        />
 
-          <div className="pt-[10]">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              パスワード
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
-        </div>
+        <TextField
+          fullWidth
+          label="パスワード"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          margin="normal"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={isLoading}
+          placeholder="••••••••"
+        />
 
-        <div className="flex justify-center pt-[10]">
-          <SubmitButton />
-        </div>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          size="large"
+          disabled={isLoading}
+          startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <LoginIcon />}
+          sx={{ mt: 3, mb: 2, py: 1.5 }}
+        >
+          {isLoading ? 'ログイン中...' : 'ログイン'}
+        </Button>
 
-        <div className="flex justify-between w-full pt-[20]">
-          <div className="text-sm">
-            <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-              アカウント登録はこちら
-            </Link>
-          </div>
-          <div className="text-sm">
-            <Link href="/forgot_password" className="font-medium text-indigo-600 hover:text-indigo-500">
-              パスワードを忘れた方
-            </Link>
-          </div>
-        </div>
-      </form>
-    </div>
+        <Divider sx={{ my: 3 }} />
+
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Button
+            component={Link}
+            href="/register"
+            variant="text"
+            fullWidth
+            disabled={isLoading}
+          >
+            アカウント登録はこちら
+          </Button>
+
+          <Button
+            component={Link}
+            href="/forgot_password"
+            variant="text"
+            fullWidth
+            disabled={isLoading}
+          >
+            パスワードを忘れた方
+          </Button>
+        </Box>
+      </Box>
+    </Paper>
   );
 }
