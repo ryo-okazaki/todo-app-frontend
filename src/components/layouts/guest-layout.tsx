@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Box, AppBar, Toolbar, Typography, Container } from '@mui/material';
+import { Box, AppBar, Toolbar, Typography } from '@mui/material';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import Link from 'next/link';
 
@@ -11,18 +11,25 @@ export default function GuestLayout({ children }: GuestLayoutProps) {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* ヘッダー */}
-      <AppBar position="static" elevation={1}>
-        <Toolbar>
+      <AppBar
+        position="fixed"
+        sx={{
+          backgroundColor: 'white',
+          color: 'text.primary',
+          boxShadow: 1,
+        }}
+      >
+        <Toolbar sx={{ px: { xs: 2, sm: 3 } }}>
           <ChecklistIcon sx={{ mr: 2, fontSize: 32 }} />
           <Typography
             variant="h6"
             component={Link}
             href="/"
             sx={{
-              flexGrow: 1,
               textDecoration: 'none',
               color: 'inherit',
               fontWeight: 'bold',
+              display: 'inline-block',
             }}
           >
             ToDoアプリ
@@ -40,11 +47,12 @@ export default function GuestLayout({ children }: GuestLayoutProps) {
           justifyContent: 'center',
           bgcolor: 'background.default',
           py: 4,
+          px: 2,
         }}
       >
-        <Container maxWidth="sm">
+        <Box sx={{ width: '100%', maxWidth: 'sm' }}>
           {children}
-        </Container>
+        </Box>
       </Box>
     </Box>
   );
