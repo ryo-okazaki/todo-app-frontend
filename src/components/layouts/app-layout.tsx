@@ -21,7 +21,7 @@ export default function AppLayout({ children, user }: AppLayoutProps) {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'grey.50' }}>
+    <Box sx={{ display: 'flex', minHeight: '98vh', bgcolor: 'grey.50' }}>
       <Header onMenuClick={handleSidebarToggle} user={user} />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>

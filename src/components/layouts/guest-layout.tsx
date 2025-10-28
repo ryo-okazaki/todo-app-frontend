@@ -1,3 +1,5 @@
+'use client';
+
 import { ReactNode } from 'react';
 import { Box, AppBar, Toolbar, Typography } from '@mui/material';
 import ChecklistIcon from '@mui/icons-material/Checklist';
@@ -9,7 +11,7 @@ interface GuestLayoutProps {
 
 export default function GuestLayout({ children }: GuestLayoutProps) {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '98vh' }}>
       {/* ヘッダー */}
       <AppBar
         position="fixed"

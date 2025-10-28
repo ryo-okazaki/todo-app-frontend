@@ -19,6 +19,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { logoutAction } from '@/app/actions/auth';
+import Link from "next/link";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -73,7 +74,18 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
           <MenuIcon />
         </IconButton>
 
-        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+        <Typography
+          variant="h6"
+          component={Link}
+          href="/"
+          sx={{
+            flexGrow: 1,
+            textDecoration: 'none',
+            color: 'inherit',
+            fontWeight: 'bold',
+            display: 'inline-block',
+          }}
+        >
           ToDoアプリ
         </Typography>
 
