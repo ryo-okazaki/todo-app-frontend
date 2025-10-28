@@ -79,7 +79,6 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
           component={Link}
           href="/"
           sx={{
-            flexGrow: 1,
             textDecoration: 'none',
             color: 'inherit',
             fontWeight: 'bold',
@@ -88,6 +87,8 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
         >
           ToDoアプリ
         </Typography>
+
+        <Box sx={{ flexGrow: 1 }} />
 
         <IconButton
           onClick={handleMenuOpen}
