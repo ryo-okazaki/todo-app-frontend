@@ -201,3 +201,109 @@ export async function requestPasswordReset(email: string) {
     };
   }
 }
+
+// バリデーションスキーマ（パスワードリセット用）
+const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'トークンが無効です'),
+  password: z
+    .string()
+    .min(8, 'パスワードは8文字以上で入力してください')
+    .regex(/[A-Za-z]/, 'パスワードには英字を含めてください')
+    .regex(/[0-9]/, 'パスワードには数字を含めてください'),
+  passwordConfirmation: z.string(),
+}).refine((data) => data.password === data.passwordConfirmation, {
+  message: 'パスワードが一致しません',
+  path: ['passwordConfirmation'],
+});
+
+export type ResetPasswordFieldErrors = {
+  token?: string[];
+  password?: string[];
+  passwordConfirmation?: string[];
+};
+
+/**
+ * パスワードをリセット
+ */
+export async function resetPassword(formData: FormData) {
+  const token = formData.get('token');
+  const password = formData.get('password');
+  const passwordConfirmation = formData.get('passwordConfirmation');
+
+  // バリデーション
+  const validationResult = resetPasswordSchema.safeParse({
+    token,
+    password,
+    passwordConfirmation,
+  });
+
+  if (!validationResult.success) {
+    const fieldErrors: ResetPasswordFieldErrors = {};
+    validationResult.error.errors.forEach((error) => {
+      const field = error.path[0] as keyof ResetPasswordFieldErrors;
+      if (!fieldErrors[field]) {
+        fieldErrors[field] = [];
+      }
+      fieldErrors[field]!.push(error.message);
+    });
+
+    return {
+      success: false,
+      error: 'バリデーションエラーがあります',
+      fieldErrors,
+    };
+  }
+
+  try {
+    const apiBaseUrl = process.env.API_BASE_URL || 'http://todo-express:3000';
+    const response = await fetch(`${apiBaseUrl}/api/user/reset_password/confirm`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: validationResult.data.token,
+        password: validationResult.data.password,
+        password_confirmation: validationResult.data.passwordConfirmation,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // サーバー側のバリデーションエラー
+      if (response.status === 422 && data.errors) {
+        const fieldErrors: ResetPasswordFieldErrors = {};
+
+        if (data.errors.token) {
+          fieldErrors.token = data.errors.token;
+        }
+        if (data.errors.password) {
+          fieldErrors.password = data.errors.password;
+        }
+
+        return {
+          success: false,
+          error: data.message || 'バリデーションエラーがあります',
+          fieldErrors,
+        };
+      }
+
+      return {
+        success: false,
+        error: data.message || 'パスワードリセットに失敗しました',
+      };
+    }
+
+    return {
+      success: true,
+      message: 'パスワードが正常に変更されました',
+    };
+  } catch (error) {
+    console.error("Password reset error:", error);
+    return {
+      success: false,
+      error: "予期せぬエラーが発生しました",
+    };
+  }
+}
