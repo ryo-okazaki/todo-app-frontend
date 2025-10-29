@@ -165,3 +165,39 @@ export async function registerAction(formData: FormData) {
     };
   }
 }
+
+/**
+ * パスワードリセットリクエストを送信
+ */
+export async function requestPasswordReset(email: string) {
+  try {
+    const apiBaseUrl = process.env.API_BASE_URL || 'http://todo-express:3000';
+    const response = await fetch(`${apiBaseUrl}/api/user/reset_password/request`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.message || "パスワード初期化に失敗しました",
+      };
+    }
+
+    return {
+      success: true,
+      message: "パスワードリセット用のメールを送信しました",
+    };
+  } catch (error) {
+    console.error("Password reset request error:", error);
+    return {
+      success: false,
+      message: "予期せぬエラーが発生しました",
+    };
+  }
+}
