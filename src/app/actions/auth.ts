@@ -307,3 +307,38 @@ export async function resetPassword(formData: FormData) {
     };
   }
 }
+
+/**
+ * アカウントを認証
+ */
+export async function verifyAccount(token: string) {
+  try {
+    const apiBaseUrl = process.env.API_BASE_URL || 'http://todo-express:3000';
+    const response = await fetch(`${apiBaseUrl}/api/user/verify/${token}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        message: data.message || "アカウント認証に失敗しました",
+      };
+    }
+
+    return {
+      success: true,
+      message: "アカウントの認証が完了しました",
+    };
+  } catch (error) {
+    console.error("Account verification error:", error);
+    return {
+      success: false,
+      message: "予期せぬエラーが発生しました",
+    };
+  }
+}
