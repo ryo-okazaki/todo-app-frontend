@@ -1,87 +1,224 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Paper,
+  CircularProgress,
+  Divider,
+} from "@mui/material";
+import LockResetIcon from "@mui/icons-material/LockReset";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { requestPasswordReset } from "@/app/actions/auth";
 
-export default function ResetPassword() {
+export default function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const router = useRouter();
+
+  const validateEmail = (email: string): string | null => {
+    if (!email) return "メールアドレスを入力してください";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "有効なメールアドレスを入力してください";
+    return null;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
+    // フロントエンドバリデーション
+    const validationError = validateEmail(email);
+    if (validationError) {
+      setError(validationError);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch("/api/user/reset_password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
+      const result = await requestPasswordReset(email);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "パスワード初期化に失敗しました");
+      if (!result.success) {
+        throw new Error(result.message);
       }
 
       setSuccess(true);
-      // 成功後に数秒待ってからログイン画面などに遷移させる
-      // setTimeout(() => router.push("/login"), 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "予期せぬエラーが発生しました");
+      setError(
+        err instanceof Error ? err.message : "予期せぬエラーが発生しました"
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 成功画面
+  if (success) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "background.default",
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            width: "100%",
+            maxWidth: 500,
+            textAlign: "center",
+            borderRadius: 2,
+          }}
+        >
+          <LockResetIcon
+            sx={{ fontSize: 64, color: "success.main", mb: 2 }}
+          />
+
+          <Typography variant="h4" component="h1" gutterBottom color="success.main">
+            送信完了
+          </Typography>
+
+          <Alert severity="success" sx={{ mt: 3, mb: 3, textAlign: "left" }}>
+            パスワード初期化のリンクを記載したメールを送信しました。
+          </Alert>
+
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            ご登録いただいたメールアドレス宛にパスワードリセット用のリンクを送信しました。
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            メールをご確認いただき、リンクをクリックしてパスワードを再設定してください。
+          </Typography>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Button
+            component={Link}
+            href="/login"
+            variant="contained"
+            fullWidth
+            startIcon={<ArrowBackIcon />}
+            sx={{ mt: 2 }}
+          >
+            ログイン画面へ戻る
+          </Button>
+        </Paper>
+      </Box>
+    );
+  }
+
+  // パスワードリセットフォーム画面
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
-      <div className="w-1/4 max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-bold">パスワードの初期化</h1>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        bgcolor: "background.default",
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          width: "100%",
+          maxWidth: 500,
+          borderRadius: 2,
+        }}
+      >
+        <Box sx={{ textAlign: "center", mb: 3 }}>
+          <LockResetIcon sx={{ fontSize: 48, color: "primary.main", mb: 1 }} />
+          <Typography variant="h4" component="h1" fontWeight="bold" color="primary">
+            パスワードの初期化
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            登録されているメールアドレスを入力してください。
+            <br />
+            パスワードリセット用のリンクをお送りします。
+          </Typography>
+        </Box>
 
-        {success ? (
-          <div className="mb-4 rounded-md bg-green-50 p-4 text-green-700">
-            <p>パスワード初期化のリンクを記載したメールを送信しました。メールをご確認ください。</p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="text-center block text-sm font-medium text-gray-700 pb-2">
-                メールアドレス
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 mb-4"
-                placeholder="your-email@example.com"
-              />
-            </div>
-
-            {error && (
-              <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
-                {error}
-              </div>
-            )}
-
-            <div className="flex w-full justify-center pt-[10]">
-              <button
-                type="submit"
-                disabled={isLoading || !email}
-                className="rounded-md bg-blue-600 px-8 py-3 text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isLoading ? "送信中..." : "送信する"}
-              </button>
-            </div>
-          </form>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
         )}
-      </div>
-    </div>
+
+        <Box component="form" onSubmit={handleSubmit} noValidate>
+          <TextField
+            fullWidth
+            label="メールアドレス"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            margin="normal"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError(null);
+            }}
+            disabled={isLoading}
+            placeholder="your-email@example.com"
+            error={!!error}
+          />
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            size="large"
+            disabled={isLoading || !email}
+            startIcon={
+              isLoading ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                <LockResetIcon />
+              )
+            }
+            sx={{ mt: 3, mb: 2, py: 1.5 }}
+          >
+            {isLoading ? "送信中..." : "送信する"}
+          </Button>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Button
+              component={Link}
+              href="/login"
+              variant="text"
+              fullWidth
+              disabled={isLoading}
+              startIcon={<ArrowBackIcon />}
+            >
+              ログイン画面へ戻る
+            </Button>
+
+            <Button
+              component={Link}
+              href="/register"
+              variant="text"
+              fullWidth
+              disabled={isLoading}
+            >
+              アカウント登録はこちら
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
+    </Box>
   );
 }
