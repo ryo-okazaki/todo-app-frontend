@@ -75,7 +75,7 @@ export async function fetchTodo(id: number): Promise<Todo> {
   }
 }
 
-export async function createTodo(title: string): Promise<Todo> {
+export async function createTodo(title: string, description?: string): Promise<Todo> {
   try {
     const response = await fetch('http://todo-express:3000/api/todo', {
       method: 'POST',
@@ -84,7 +84,7 @@ export async function createTodo(title: string): Promise<Todo> {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${(await cookies()).get('authToken')?.value}`
       },
-      body: JSON.stringify({ title })
+      body: JSON.stringify({ title, description })
     });
 
     if (!response.ok) {
