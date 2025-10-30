@@ -10,7 +10,8 @@ interface User {
 export async function getCurrentUser() {
   try {
     // クッキーからトークンを取得
-    const token = await cookies().get('authToken')?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('authToken' as any)?.value;
 
     if (!token) {
       return { error: 'Not authenticated' };
