@@ -3,7 +3,25 @@
 import { useState, useEffect, useRef, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { fetchTodo, updateTodo, Todo } from '../../../actions/todo';
+import {
+  Container,
+  Paper,
+  Typography,
+  Box,
+  Button,
+  TextField,
+  Alert,
+  CircularProgress,
+  Grid,
+  Card,
+  CardMedia,
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
+import ImageIcon from '@mui/icons-material/Image';
+import { fetchTodo, updateTodo, Todo } from "@/app/actions/todo";
 
 interface PageProps {
   params: {
@@ -60,13 +78,13 @@ export default function TodoDetailPage({ params }: PageProps) {
       formData.append('title', title);
       formData.append('description', description);
 
-      // 選択されたファイルを追加
       selectedFiles.forEach(file => {
         formData.append('images', file);
       });
 
       const updatedTodo = await updateTodo(todoId, formData);
       setTodo(updatedTodo);
+      setSelectedFiles([]);
       setIsEditing(false);
       router.refresh();
     } catch (err) {
@@ -85,7 +103,6 @@ export default function TodoDetailPage({ params }: PageProps) {
   };
 
   const handleCancelEdit = () => {
-    // 編集をキャンセルしたら、元の値に戻す
     if (todo) {
       setTitle(todo.title);
       setDescription(todo.description || '');
@@ -97,192 +114,232 @@ export default function TodoDetailPage({ params }: PageProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="container mx-auto px-4 max-w-2xl">
-          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-            <div className="animate-pulse">読み込み中...</div>
-          </div>
-        </div>
-      </div>
+      <Container maxWidth="md">
+        <Paper elevation={2} sx={{ p: 4, borderRadius: 2, textAlign: 'center' }}>
+          <CircularProgress />
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            読み込み中...
+          </Typography>
+        </Paper>
+      </Container>
     );
   }
 
   if (error && !todo) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="container mx-auto px-4 max-w-2xl">
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-              <p className="text-red-700">{error}</p>
-            </div>
-            <Link
-              href="/todo"
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 transition-colors"
-            >
-              一覧に戻る
-            </Link>
-          </div>
-        </div>
-      </div>
+      <Container maxWidth="md">
+        <Paper elevation={2} sx={{ p: 4, borderRadius: 2 }}>
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+          <Button
+            component={Link}
+            href="/todo"
+            variant="outlined"
+            startIcon={<ArrowBackIcon />}
+          >
+            一覧に戻る
+          </Button>
+        </Paper>
+      </Container>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4 max-w-2xl">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="flex justify-between items-center mb-6 border-b pb-4">
-            <h1 className="text-3xl font-bold text-gray-800">
-              {isEditing ? 'ToDo 編集' : 'ToDo 詳細'}
-            </h1>
-            <div className="flex space-x-3">
-              <Link
-                href="/todo"
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 transition-colors"
+    <Container maxWidth="md">
+      <Paper elevation={2} sx={{ p: 4, borderRadius: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, pb: 2, borderBottom: 1, borderColor: 'divider' }}>
+          <Typography variant="h4" component="h1" fontWeight="bold" color="primary">
+            {isEditing ? 'ToDo 編集' : 'ToDo 詳細'}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              component={Link}
+              href="/todo"
+              variant="outlined"
+              startIcon={<ArrowBackIcon />}
+            >
+              一覧に戻る
+            </Button>
+            {!isEditing && (
+              <Button
+                onClick={() => setIsEditing(true)}
+                variant="contained"
+                startIcon={<EditIcon />}
               >
-                一覧に戻る
-              </Link>
-              {!isEditing && (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white transition-colors"
-                >
-                  編集する
-                </button>
-              )}
-            </div>
-          </div>
+                編集する
+              </Button>
+            )}
+          </Box>
+        </Box>
 
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-              <p className="text-red-700">{error}</p>
-            </div>
-          )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-          {isEditing ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                  タイトル <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                  required
-                />
-              </div>
+        {isEditing ? (
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            <TextField
+              fullWidth
+              required
+              id="title"
+              label="タイトル"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              sx={{ mb: 3 }}
+              error={!title.trim() && error !== null}
+              helperText={!title.trim() && error !== null ? 'タイトルは必須です' : ''}
+            />
 
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                  説明
-                </label>
-                <textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
+            <TextField
+              fullWidth
+              id="description"
+              label="説明"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              multiline
+              rows={4}
+              sx={{ mb: 3 }}
+            />
 
-              <div>
-                <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-1">
-                  画像
-                </label>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                画像
+              </Typography>
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={<ImageIcon />}
+              >
+                画像を選択
                 <input
                   type="file"
-                  id="images"
                   ref={fileInputRef}
                   onChange={handleFileChange}
                   accept="image/*"
                   multiple
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                  hidden
                 />
-                {selectedFiles.length > 0 && (
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-600">選択済み: {selectedFiles.map(f => f.name).join(', ')}</p>
-                  </div>
+              </Button>
+              {selectedFiles.length > 0 && (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    選択済み: {selectedFiles.map(f => f.name).join(', ')}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+
+            {todo?.images && Array.isArray(todo.images) && todo.images.length > 0 && (
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle1" gutterBottom>
+                  既存の画像
+                </Typography>
+                <Grid container spacing={2}>
+                  {todo.images.map((image: any, index: number) => (
+                    <Grid item key={index}>
+                      <Card elevation={1}>
+                        <CardMedia
+                          component="img"
+                          image={image.url}
+                          alt={`画像 ${index + 1}`}
+                          sx={{
+                            width: 150,
+                            height: 150,
+                            objectFit: 'cover',
+                          }}
+                        />
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            )}
+
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button
+                onClick={handleCancelEdit}
+                variant="outlined"
+                color="inherit"
+                startIcon={<CancelIcon />}
+              >
+                キャンセル
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={isSubmitting}
+                startIcon={<SaveIcon />}
+              >
+                {isSubmitting ? '保存中...' : '保存する'}
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Box>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                タイトル
+              </Typography>
+              <Typography variant="h6">
+                {todo?.title}
+              </Typography>
+            </Box>
+
+            {todo?.description && (
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  説明
+                </Typography>
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+                  {todo.description}
+                </Typography>
+              </Box>
+            )}
+
+            {todo?.images && Array.isArray(todo.images) && todo.images.length > 0 && (
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  画像
+                </Typography>
+                <Grid container spacing={2}>
+                  {todo.images.map((image: any, index: number) => (
+                    <Grid item key={index}>
+                      <Card elevation={2}>
+                        <CardMedia
+                          component="img"
+                          image={image.url}
+                          alt={`画像 ${index + 1}`}
+                          sx={{
+                            width: 200,
+                            height: 200,
+                            objectFit: 'cover',
+                          }}
+                        />
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            )}
+
+            {todo?.createdAt && (
+              <Box sx={{ pt: 3, borderTop: 1, borderColor: 'divider' }}>
+                <Typography variant="body2" color="text.secondary">
+                  作成日時: {new Date(todo.createdAt).toLocaleString('ja-JP')}
+                </Typography>
+                {todo.updatedAt && (
+                  <Typography variant="body2" color="text.secondary">
+                    更新日時: {new Date(todo.updatedAt).toLocaleString('ja-JP')}
+                  </Typography>
                 )}
-              </div>
-
-              {todo?.images && todo.images.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">既存の画像</h3>
-                  <div className="flex gap-4">
-                    {todo.images.map((image, index) => (
-                      <div key={index} className="rounded-lg overflow-hidden bg-gray-100">
-                        <img src={image.url} alt={`画像 ${index + 1}`} className="p-[5] h-auto object-cover" width={150} height={150} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={handleCancelEdit}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  キャンセル
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white transition-colors ${
-                    isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {isSubmitting ? '保存中...' : '保存する'}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-sm font-medium text-gray-500">タイトル</h2>
-                <p className="mt-1 text-lg">{todo?.title}</p>
-              </div>
-
-              {todo?.description && (
-                <div>
-                  <h2 className="text-sm font-medium text-gray-500">説明</h2>
-                  <p className="mt-1 whitespace-pre-line">{todo.description}</p>
-                </div>
-              )}
-
-              {todo?.images && todo.images.length > 0 && (
-                <div>
-                  <h2 className="text-sm font-medium text-gray-500">画像</h2>
-                  <div className="flex mt-1">
-                    {todo.images.map((image, index) => (
-                      <div key={index} className="rounded-lg overflow-hidden">
-                        <img src={image.url} alt={`画像 ${index + 1}`} className="p-[5] h-auto object-cover" width={200} height={200} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {todo?.createdAt && (
-                <div className="pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-500">
-                    作成日時: {new Date(todo.createdAt).toLocaleString('ja-JP')}
-                  </p>
-                  {todo.updatedAt && (
-                    <p className="text-sm text-gray-500">
-                      更新日時: {new Date(todo.updatedAt).toLocaleString('ja-JP')}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+              </Box>
+            )}
+          </Box>
+        )}
+      </Paper>
+    </Container>
   );
 }
