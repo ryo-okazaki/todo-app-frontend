@@ -3,7 +3,18 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createTodo } from '../../../actions/todo';
+import {
+  Container,
+  Paper,
+  Typography,
+  Box,
+  Button,
+  TextField,
+  Alert,
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SaveIcon from '@mui/icons-material/Save';
+import { createTodo } from "@/app/actions/todo";
 
 export default function NewTodoPage() {
   const [title, setTitle] = useState('');
@@ -24,9 +35,9 @@ export default function NewTodoPage() {
     setError(null);
 
     try {
-      await createTodo(title);
+      await createTodo(title, description);
       router.push('/todo');
-      router.refresh(); // 一覧を更新するため
+      router.refresh();
     } catch (err) {
       setError('ToDoの作成に失敗しました。もう一度お試しください。');
       console.error(err);
@@ -36,75 +47,74 @@ export default function NewTodoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4 max-w-2xl">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="flex justify-between items-center mb-6 border-b pb-4">
-            <h1 className="text-3xl font-bold text-gray-800">ToDo 新規作成</h1>
-            <Link
+    <Container maxWidth="md">
+      <Paper elevation={2} sx={{ p: 4, borderRadius: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, pb: 2, borderBottom: 1, borderColor: 'divider' }}>
+          <Typography variant="h4" component="h1" fontWeight="bold" color="primary">
+            ToDo 新規作成
+          </Typography>
+          <Button
+            component={Link}
+            href="/todo"
+            variant="outlined"
+            startIcon={<ArrowBackIcon />}
+          >
+            一覧に戻る
+          </Button>
+        </Box>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Box component="form" onSubmit={handleSubmit} noValidate>
+          <TextField
+            fullWidth
+            required
+            id="title"
+            label="タイトル"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="ToDoのタイトルを入力"
+            sx={{ mb: 3 }}
+            error={!title.trim() && error !== null}
+            helperText={!title.trim() && error !== null ? 'タイトルは必須です' : ''}
+          />
+
+          <TextField
+            fullWidth
+            id="description"
+            label="説明"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="ToDoの説明を入力（任意）"
+            multiline
+            rows={4}
+            sx={{ mb: 4 }}
+          />
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Button
+              component={Link}
               href="/todo"
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-gray-700 transition-colors"
+              variant="outlined"
+              color="inherit"
             >
-              一覧に戻る
-            </Link>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-              <p className="text-red-700">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                タイトル <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="ToDoのタイトルを入力"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                説明
-              </label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="ToDoの説明を入力（任意）"
-              />
-            </div>
-
-            <div className="flex justify-end space-x-4">
-              <Link
-                href="/todo"
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                キャンセル
-              </Link>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white transition-colors ${
-                  isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
-              >
-                {isSubmitting ? '作成中...' : '作成する'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+              キャンセル
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isSubmitting}
+              startIcon={<SaveIcon />}
+            >
+              {isSubmitting ? '作成中...' : '作成する'}
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
+    </Container>
   );
 }
