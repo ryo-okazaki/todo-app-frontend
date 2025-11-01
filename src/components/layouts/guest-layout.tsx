@@ -52,7 +52,7 @@ export default function GuestLayout({ children }: GuestLayoutProps) {
           px: 2,
         }}
       >
-        <Box sx={{ width: '100%', maxWidth: 'sm' }}>
+        <Box sx={{ width: '100%', maxWidth: 1200 }}>
           {children}
         </Box>
       </Box>
