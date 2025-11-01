@@ -12,9 +12,13 @@ import {
   Paper,
   CircularProgress,
   Divider,
+  Stack,
 } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
+import GoogleIcon from '@mui/icons-material/Google';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { loginAction } from '@/app/actions/auth';
+import { loginWithKeycloak, loginWithGoogle } from '@/lib/keycloak';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -23,6 +27,7 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // 既存のToDoアプリ認証
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError(null);
@@ -52,6 +57,30 @@ export default function LoginForm() {
     }
   };
 
+  // Keycloak認証(マイクロサービスID)
+  const handleKeycloakLogin = async () => {
+    setIsLoading(true);
+    setFormError(null);
+    try {
+      await loginWithKeycloak();
+    } catch (error) {
+      setFormError('マイクロサービスIDでのログインに失敗しました');
+      setIsLoading(false);
+    }
+  };
+
+  // Google連携
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    setFormError(null);
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      setFormError('Googleでのログインに失敗しました');
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Paper
       elevation={3}
@@ -74,7 +103,54 @@ export default function LoginForm() {
         </Alert>
       )}
 
+      {/* SSO認証オプション */}
+      <Stack spacing={2} sx={{ mb: 3 }}>
+        <Button
+          fullWidth
+          variant="outlined"
+          size="large"
+          startIcon={<AccountCircleIcon />}
+          onClick={handleKeycloakLogin}
+          disabled={isLoading}
+          sx={{ py: 1.5, textTransform: 'none' }}
+        >
+          マイクロサービスIDでログイン
+        </Button>
+
+        <Button
+          fullWidth
+          variant="outlined"
+          size="large"
+          startIcon={<GoogleIcon />}
+          onClick={handleGoogleLogin}
+          disabled={isLoading}
+          sx={{
+            py: 1.5,
+            textTransform: 'none',
+            borderColor: '#4285f4',
+            color: '#4285f4',
+            '&:hover': {
+              borderColor: '#357ae8',
+              bgcolor: 'rgba(66, 133, 244, 0.04)',
+            },
+          }}
+        >
+          Googleでログイン
+        </Button>
+      </Stack>
+
+      <Divider sx={{ my: 3 }}>
+        <Typography variant="body2" color="text.secondary">
+          または
+        </Typography>
+      </Divider>
+
+      {/* 既存のToDoアプリ専用ログイン */}
       <Box component="form" onSubmit={handleSubmit} noValidate>
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+          ToDoアプリ専用アカウント
+        </Typography>
+
         <TextField
           fullWidth
           label="メールアドレス"
