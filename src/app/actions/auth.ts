@@ -342,3 +342,55 @@ export async function verifyAccount(token: string) {
     };
   }
 }
+
+export async function syncKeycloakUserAction(keycloakToken: string) {
+  'use server';
+
+  try {
+    const apiBaseUrl = process.env.API_BASE_URL || 'http://todo-express:3000';
+
+    const response = await fetch(`${apiBaseUrl}/api/user/sso_sync`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${keycloakToken}`,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.error || 'ユーザー同期に失敗しました',
+      };
+    }
+
+    const data = await response.json();
+    console.log('syncKeycloakUserAction data:', data);
+
+    // Keycloakトークンをサーバー側のCookieに保存
+    const cookieStore = await cookies();
+    cookieStore.set({
+      name: 'keycloak_token',
+      value: keycloakToken,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60, // 1時間
+      path: '/',
+      sameSite: 'lax',
+    });
+
+    return {
+      success: true,
+      message: data.message,
+      user: data.user,
+    };
+  } catch (error) {
+    console.error('Keycloak sync error:', error);
+    return {
+      success: false,
+      error: '認証サービスとの同期に失敗しました',
+    };
+  }
+}
