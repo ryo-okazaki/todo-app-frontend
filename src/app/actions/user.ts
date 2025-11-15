@@ -12,11 +12,14 @@ export async function getCurrentUser() {
   try {
     // クッキーからトークンを取得
     const cookieStore = await cookies();
-    const token = cookieStore.get('authToken' as any)?.value;
+    const todoAppToken = cookieStore.get('authToken')?.value;
+    const keycloakToken = cookieStore.get('keycloak_token')?.value;
 
-    if (!token) {
+    if (!todoAppToken && !keycloakToken) {
       return { error: 'Not authenticated' };
     }
+
+    const token = todoAppToken || keycloakToken;
 
     const apiBaseUrl = process.env.API_BASE_URL || 'http://todo-express:3000';
     const response = await fetch(`${apiBaseUrl}/api/user`, {
