@@ -11,13 +11,24 @@ export interface Todo {
   updatedAt?: string;
 }
 
+// ToDo: 要リファクタ
+async function getTokenFromCookies() {
+  const cookieStore = await cookies();
+  const todoAppToken = cookieStore.get('authToken' as any)?.value;
+  const keycloakToken = cookieStore.get('keycloak_token' as any)?.value;
+
+  return todoAppToken || keycloakToken;
+}
+
 // サーバーコンポーネントからの呼び出し用
 export async function fetchTodosServer(): Promise<Todo[]> {
   try {
+    const token = await getTokenFromCookies();
+
     const response = await fetch('http://todo-express:3000/api/todo', {
       headers: {
         'Accept': 'application/json',
-        'Authorization': `Bearer ${(await cookies()).get('authToken')?.value}`
+        'Authorization': `Bearer ${token}`
       },
       cache: 'no-store'
     });
@@ -36,10 +47,12 @@ export async function fetchTodosServer(): Promise<Todo[]> {
 // クライアントコンポーネントからの呼び出し用
 export async function fetchTodos(): Promise<Todo[]> {
   try {
+    const token = await getTokenFromCookies();
+
     const response = await fetch('http://todo-express:3000/api/todo', {
       headers: {
         'Accept': 'application/json',
-        'Authorization': `Bearer ${(await cookies()).get('authToken')?.value}`
+        'Authorization': `Bearer ${token}`
       },
       cache: 'no-store'
     });
@@ -57,10 +70,12 @@ export async function fetchTodos(): Promise<Todo[]> {
 
 export async function fetchTodo(id: number): Promise<Todo> {
   try {
+    const token = await getTokenFromCookies();
+
     const response = await fetch(`http://todo-express:3000/api/todo/${id}`, {
       headers: {
         'Accept': 'application/json',
-        'Authorization': `Bearer ${(await cookies()).get('authToken')?.value}`
+        'Authorization': `Bearer ${token}`
       }
     });
 
@@ -77,12 +92,14 @@ export async function fetchTodo(id: number): Promise<Todo> {
 
 export async function createTodo(title: string, description?: string): Promise<Todo> {
   try {
+    const token = await getTokenFromCookies();
+
     const response = await fetch('http://todo-express:3000/api/todo', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${(await cookies()).get('authToken')?.value}`
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ title, description })
     });
@@ -103,10 +120,12 @@ export async function updateTodo(
   formData: FormData
 ): Promise<Todo> {
   try {
+    const token = await getTokenFromCookies();
+
     const response = await fetch(`http://todo-express:3000/api/todo/${id}`, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${(await cookies()).get('authToken')?.value}`
+        'Authorization': `Bearer ${token}`
       },
       body: formData
     });
