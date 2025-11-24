@@ -2,7 +2,7 @@ import Keycloak from "keycloak-js";
 
 // Keycloak設定
 const keycloakConfig = {
-  url: process.env.KEYCLOAK_CLIENT_URL || 'http://localhost:8080',
+  url: process.env.KEYCLOAK_CLIENT_URL || 'http://localhost:80',
   realm: process.env.KEYCLOAK_REALM || 'microservice-app',
   clientId: process.env.KEYCLOAK_FRONTEND_CLIENT_ID || 'todo-frontend-client',
 };
