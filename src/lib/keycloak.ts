@@ -52,6 +52,7 @@ export async function loginWithKeycloak(): Promise<void> {
     redirectUri: window.location.origin + '/callback',
   });
 }
+
 export async function loginWithGoogle(): Promise<void> {
   const keycloak = getKeycloakInstance();
 
