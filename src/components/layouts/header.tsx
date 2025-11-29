@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { logoutAction } from '@/app/actions/auth';
 import Link from "next/link";
+import { logoutKeycloak } from "@/lib/keycloak";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -49,8 +50,12 @@ export default function Header({ onMenuClick, user }: HeaderProps) {
 
   const handleLogout = async () => {
     handleMenuClose();
+
+    // アプリのCookieを削除
     await logoutAction();
-    router.push('/login');
+
+    // Keycloakセッションも終了（全アプリからログアウト）
+    await logoutKeycloak();
   };
 
   return (
