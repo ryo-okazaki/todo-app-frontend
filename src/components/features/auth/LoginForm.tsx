@@ -58,14 +58,14 @@ export default function LoginForm() {
     }
   };
 
-  // Keycloak認証(マイクロサービスID)
+  // Keycloak認証
   const handleKeycloakLogin = async () => {
     setIsLoading(true);
     setFormError(null);
     try {
       await loginWithKeycloak();
     } catch (error) {
-      setFormError('マイクロサービスIDでのログインに失敗しました');
+      setFormError('Keycloak IDでのログインに失敗しました');
       setIsLoading(false);
     }
   };
@@ -201,7 +201,7 @@ export default function LoginForm() {
                 disabled={isLoading}
                 sx={{ py: 1.5, textTransform: 'none' }}
               >
-                マイクロサービスIDでログイン
+                Keycloak IDでログイン
               </Button>
 
               <Button
