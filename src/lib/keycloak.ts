@@ -1,6 +1,5 @@
 import Keycloak from "keycloak-js";
 
-// Keycloak設定
 const keycloakConfig = {
   url: process.env.KEYCLOAK_CLIENT_URL || 'http://localhost:80',
   realm: process.env.KEYCLOAK_REALM || 'microservice-app',
@@ -47,16 +46,16 @@ export async function loginWithKeycloak(): Promise<void> {
     });
   }
 
-  // ログイン実行(initの完了を待ってから実行)
+  // Keycloak経由でログイン
   await keycloak.login({
     redirectUri: window.location.origin + '/callback',
+    prompt: 'login', // 常に認証画面を表示
   });
 }
 
 export async function loginWithGoogle(): Promise<void> {
   const keycloak = getKeycloakInstance();
 
-  // 初期化していない場合は初期化
   if (!keycloak.didInitialize) {
     await keycloak.init({
       checkLoginIframe: false,
@@ -64,13 +63,15 @@ export async function loginWithGoogle(): Promise<void> {
     });
   }
 
-  // Google経由でログイン実行
+  // Google経由でログイン
   await keycloak.login({
     idpHint: 'google',
     redirectUri: window.location.origin + '/callback',
+    prompt: 'login', // 常に認証画面を表示
   });
 }
 
+// ログアウト: 全アプリからログアウト
 export async function logoutKeycloak(): Promise<void> {
   const keycloak = getKeycloakInstance();
   await keycloak.logout({
