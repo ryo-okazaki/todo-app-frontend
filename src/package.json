@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:debug": "NODE_OPTIONS='--inspect=0.0.0.0:9229' next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
