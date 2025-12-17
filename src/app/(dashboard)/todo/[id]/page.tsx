@@ -24,14 +24,14 @@ import ImageIcon from '@mui/icons-material/Image';
 import { fetchTodo, updateTodo, Todo } from "@/app/actions/todo";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function TodoDetailPage({ params }: PageProps) {
-  const unwrappedParams = use(params as any);
-  const todoId = unwrappedParams?.id;
+  const { id } = use(params);
+  const todoId = parseInt(id, 10);
   const [todo, setTodo] = useState<Todo | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -239,7 +239,7 @@ export default function TodoDetailPage({ params }: PageProps) {
                 </Typography>
                 <Grid container spacing={2}>
                   {todo.images.map((image: any, index: number) => (
-                    <Grid item key={index}>
+                    <Grid key={index}>
                       <Card elevation={1}>
                         <CardMedia
                           component="img"
@@ -306,7 +306,7 @@ export default function TodoDetailPage({ params }: PageProps) {
                 </Typography>
                 <Grid container spacing={2}>
                   {todo.images.map((image: any, index: number) => (
-                    <Grid item key={index}>
+                    <Grid key={index}>
                       <Card elevation={2}>
                         <CardMedia
                           component="img"

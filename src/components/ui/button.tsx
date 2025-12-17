@@ -1,29 +1,51 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import React from 'react';
 import { Button as MuiButton, CircularProgress } from '@mui/material';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
-  loading?: boolean;
-  variant?: 'contained' | 'outlined' | 'text';
+export interface ButtonProps {
+  children: React.ReactNode;
+  variant?: 'text' | 'outlined' | 'contained';
+  color?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success' | 'inherit';
+  size?: 'small' | 'medium' | 'large';
   fullWidth?: boolean;
+  disabled?: boolean;
+  loading?: boolean;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  type?: 'button' | 'submit' | 'reset';
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
+  form?: string;
 }
 
-export default function Button({
+export function Button({
   children,
-  loading = false,
   variant = 'contained',
+  color = 'primary',
+  size = 'medium',
   fullWidth = false,
-  disabled,
+  disabled = false,
+  loading = false,
+  onClick,
+  type = 'button',
+  startIcon,
+  endIcon,
+  form,
   ...props
 }: ButtonProps) {
   return (
     <MuiButton
       variant={variant}
+      color={color}
+      size={size}
       fullWidth={fullWidth}
       disabled={disabled || loading}
+      onClick={onClick}
+      type={type}
+      startIcon={loading ? <CircularProgress size={16} /> : startIcon}
+      endIcon={endIcon}
+      form={form}
       {...props}
     >
-      {loading ? <CircularProgress size={24} color="inherit" /> : children}
+      {children}
     </MuiButton>
   );
 }

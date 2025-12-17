@@ -92,7 +92,7 @@ export default function LoginForm() {
 
       <Grid container spacing={3} justifyContent="center">
         {/* 左側: ToDoアプリ専用アカウント (60%) */}
-        <Grid item xs={12} md={7.2}>
+        <Grid size={{ xs: 12, sm: 6, md: 7.2 }}>
           <Paper
             elevation={3}
             sx={{
@@ -175,7 +175,7 @@ export default function LoginForm() {
         </Grid>
 
         {/* 右側: 外部サービスログイン (40%) */}
-        <Grid item xs={12} md={4.8}>
+        <Grid size={{ xs: 12, md: 4.8 }}>
           <Paper
             elevation={3}
             sx={{

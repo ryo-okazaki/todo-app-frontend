@@ -34,7 +34,7 @@ export default async function DashboardPage() {
           </Typography>
 
           <Grid container spacing={3} sx={{ mt: 2 }}>
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Card elevation={3} sx={{ height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)' } }}>
                 <CardActionArea component={Link} href="/todo" sx={{ height: '100%', p: 2 }}>
                   <CardContent sx={{ textAlign: 'center' }}>

@@ -85,7 +85,7 @@ export default async function TodosPage() {
         ) : (
           <Grid container spacing={3}>
             {todos.map((todo: Todo) => (
-              <Grid item xs={12} key={todo.id}>
+              <Grid size={{ xs: 12 }} key={todo.id}>
                 <Card
                   elevation={1}
                   sx={{

@@ -91,7 +91,7 @@ export async function registerAction(formData: FormData) {
 
   if (!validationResult.success) {
     const fieldErrors: RegisterFieldErrors = {};
-    validationResult.error.errors.forEach((error) => {
+    validationResult.error.issues.forEach((error) => {
       const field = error.path[0] as keyof RegisterFieldErrors;
       if (!fieldErrors[field]) {
         fieldErrors[field] = [];
@@ -240,7 +240,7 @@ export async function resetPassword(formData: FormData) {
 
   if (!validationResult.success) {
     const fieldErrors: ResetPasswordFieldErrors = {};
-    validationResult.error.errors.forEach((error) => {
+    validationResult.error.issues.forEach((error) => {
       const field = error.path[0] as keyof ResetPasswordFieldErrors;
       if (!fieldErrors[field]) {
         fieldErrors[field] = [];

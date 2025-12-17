@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -17,8 +16,9 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import LoginIcon from "@mui/icons-material/Login";
 import { verifyAccount } from "@/app/actions/auth";
+import { ResetPasswordFormContent } from "@/components/features/auth/ResetPasswordForm";
 
-export default function VerifyAccount() {
+export function VerifyAccountContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -217,4 +217,12 @@ export default function VerifyAccount() {
   }
 
   return null;
+}
+
+export default function VerifyAccount() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyAccountContent />
+    </Suspense>
+  );
 }
