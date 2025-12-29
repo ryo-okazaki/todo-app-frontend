@@ -34,6 +34,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# curlとwgetのインストール(ヘルスチェック用)
+RUN apk add --no-cache curl wget
+
 # 静的ファイルのコピー
 # 注意: publicフォルダはルートに配置してください
 COPY --from=builder /app/public ./public
