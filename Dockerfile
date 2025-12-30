@@ -13,6 +13,11 @@ RUN npm ci
 # 2. Builder ステージ
 FROM base AS builder
 WORKDIR /app
+
+# ビルド時引数としてCloudFront URLを受け取る
+ARG NEXT_PUBLIC_ASSET_PREFIX
+ENV NEXT_PUBLIC_ASSET_PREFIX=${NEXT_PUBLIC_ASSET_PREFIX}
+
 COPY --from=deps /app/node_modules ./node_modules
 # プロジェクトファイル全体をコピー
 COPY . .
