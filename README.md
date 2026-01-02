@@ -120,10 +120,10 @@ src/
 
 ECS へのデプロイは `todo-app-infrastructure` リポジトリで管理されています。
 
-詳細は [todo-app-infrastructure](../todo-app-infrastructure) を参照してください。
+詳細は [todo-app-infrastructure](https://github.com/ryo-okazaki/common-auth-system) を参照してください。
 
 ## 関連リポジトリ
 
-- [todo-app-infrastructure](../todo-app-infrastructure): インフラストラクチャ（Terraform）
-- [todo-app-express](../todo-app-express): バックエンド（Express）
-- [app-authentication](../app-authentication): 共通認証基盤（Keycloak）
+- [todo-app-infrastructure](https://github.com/ryo-okazaki/todo-app-infrastructure): インフラストラクチャ（Terraform）
+- [todo-app-backend](https://github.com/ryo-okazaki/todo-app-backend): バックエンド（Express）
+- [common-auth-system](https://github.com/ryo-okazaki/common-auth-system): 共通認証基盤（Keycloak）
